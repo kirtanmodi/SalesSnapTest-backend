@@ -16,13 +16,13 @@ async function readCSVFromBlob() {
   const downloadBlockBlobResponse = await blobClient.download();
   const readableStream = downloadBlockBlobResponse.readableStreamBody;
 
-  // Open a writable stream to the output file
+  
   const writeStream = fs.createWriteStream(OUTPUT_FILE);
 
-  // Start writing to the file
+  
   writeStream.write('[');
 
-  // Converting the readableStream to a stream that can be parsed by csv-parser
+  
   const readStream = stream.Readable.from(readableStream);
   let firstRow = true;
   readStream.pipe(csvParser())
@@ -30,7 +30,7 @@ async function readCSVFromBlob() {
       if (!firstRow) {
         writeStream.write(',');
       }
-      writeStream.write(JSON.stringify(row)); // Write the JSON object for each row
+      writeStream.write(JSON.stringify(row)); 
       firstRow = false;
     })
     .on('end', () => {
