@@ -1,44 +1,52 @@
-require('dotenv').config();
-const { BlobServiceClient } = require('@azure/storage-blob');
-const csvParser = require('csv-parser');
-const stream = require('stream');
-const fs = require('fs');
+require("dotenv").config();
+const { BlobServiceClient } = require("@azure/storage-blob");
+const csvParser = require("csv-parser");
+const stream = require("stream");
+const fs = require("fs");
 
-const AZURE_STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING;
-const CONTAINER_NAME = 'main';
-const BLOB_NAME = 'data/lou_malnatis/dw/Snap/Snap_Sales/part-00000-tid-4461000225816458826-bd64164a-1025-45e7-a336-83b5c8bce192-10018-1-c000.csv';
-const BLOB_PAYROLL = `data/lou_malnatis/dw/Snap/Snap_Payroll/part-00000-tid-125739318678499795-9e0332c3-1304-4e59-9a82-ee93d37e22d6-14502-1-c000.csv`
-const BLOB_PRODUCT = `data/lou_malnatis/dw/Snap/Snap_Product/part-00000-tid-6051312648026986729-f9e7ce36-4088-4d5f-9ba4-d795b135e392-10014-1-c000.csv`
-const OUTPUT_FILE = 'product.json';
+const AZURE_STORAGE_CONNECTION_STRING =
+  process.env.AZURE_STORAGE_CONNECTION_STRING;
+const CONTAINER_NAME = "main";
+const BLOB_Sales = "data/lou_malnatis/dw/Snap/Snap_Sales/Snap_Sales.csv";
+const BLOB_PAYROLL = `data/lou_malnatis/dw/Snap/Snap_Payroll/Snap_Payroll.csv`;
+const BLOB_PRODUCT = `data/lou_malnatis/dw/Snap/Snap_Product/Snap_Product.csv`;
+const BLOB_Sales_Weekly = `data/lou_malnatis/dw/Snap/Snap_Sales_Weekly/Snap_Sales_Weekly.csv`;
+// Big Commerce Analytics
+const BLOB_REVENUE = `data/taste_of_chicago/dw/BigCommercePortal/Overview/revenue_by_hour/revenue_by_hour.csv`;
+const BLOB_SALES_KPI = `data/taste_of_chicago/dw/BigCommercePortal/Overview/Sales_revenue_KPI/Sales_revenue_KPI.csv`;
+const OUTPUT_FILE = "Snap_Sales.json";
 
 async function readCSVFromBlob() {
-  const blobServiceClient = BlobServiceClient.fromConnectionString(AZURE_STORAGE_CONNECTION_STRING);
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    AZURE_STORAGE_CONNECTION_STRING
+  );
   const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
-  const blobClient = containerClient.getBlobClient(BLOB_PRODUCT);
+  const blobClient = containerClient.getBlobClient(BLOB_Sales);
   const downloadBlockBlobResponse = await blobClient.download();
   const readableStream = downloadBlockBlobResponse.readableStreamBody;
 
-  
   const writeStream = fs.createWriteStream(OUTPUT_FILE);
 
-  
-  writeStream.write('[');
+  writeStream.write("[");
 
-  
   const readStream = stream.Readable.from(readableStream);
   let firstRow = true;
-  readStream.pipe(csvParser())
-    .on('data', (row) => {
+  readStream
+    .pipe(csvParser())
+    .on("data", (row) => {
       if (!firstRow) {
-        writeStream.write(',');
+        writeStream.write(",");
       }
-      writeStream.write(JSON.stringify(row)); 
+      writeStream.write(JSON.stringify(row));
       firstRow = false;
     })
-    .on('end', () => {
-      writeStream.write(']');
+    .on("end", () => {
+      writeStream.write("]");
       writeStream.end();
-      console.log('CSV file successfully processed and written to', OUTPUT_FILE);
+      console.log(
+        "CSV file successfully processed and written to",
+        OUTPUT_FILE
+      );
     });
 }
 
