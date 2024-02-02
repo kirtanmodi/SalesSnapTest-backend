@@ -14,14 +14,14 @@ const BLOB_Sales_Weekly = `data/lou_malnatis/dw/Snap/Snap_Sales_Weekly/Snap_Sale
 // Big Commerce Analytics
 const BLOB_REVENUE = `data/taste_of_chicago/dw/BigCommercePortal/Overview/revenue_by_hour/revenue_by_hour.csv`;
 const BLOB_SALES_KPI = `data/taste_of_chicago/dw/BigCommercePortal/Overview/Sales_revenue_KPI/Sales_revenue_KPI.csv`;
-const OUTPUT_FILE = "Snap_Sales.json";
+const OUTPUT_FILE = "Sales_revenue_KPI.json"; // Change this to the output file you want
 
 async function readCSVFromBlob() {
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     AZURE_STORAGE_CONNECTION_STRING
   );
   const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
-  const blobClient = containerClient.getBlobClient(BLOB_Sales);
+  const blobClient = containerClient.getBlobClient(BLOB_SALES_KPI); // Change this to the blob you want to read
   const downloadBlockBlobResponse = await blobClient.download();
   const readableStream = downloadBlockBlobResponse.readableStreamBody;
 
